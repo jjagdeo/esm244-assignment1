@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE,
                       warning = FALSE)
 ```
 
-Environmental and climatic variables for a range of countries have been obtained from publicly available remote sensing datasets and published on the Google Earth Engine platform (zander_venter, Kaggle). This project explores the potential associations between the country-level environmental and climatic variables through a principal components analysis. The goal is to determine if there are any associations between countries, their accessibility to cities, elevation, and mean annual temperature and precipitation. 
+Environmental and climatic variables for a range of countries have been obtained from publicly available remote sensing datasets and published on the Google Earth Engine platform (zander_venter, Kaggle). This project explores the potential associations between the country-level environmental and climatic variables through a principal components analysis. The goal is to determine if there are any associations between countries' accessibility to cities, elevation, and mean annual temperature and precipitation. 
 
 #### 1. Load necessary packages.
 ```{r}
