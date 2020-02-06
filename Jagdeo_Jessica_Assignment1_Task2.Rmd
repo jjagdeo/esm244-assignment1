@@ -1,0 +1,106 @@
+---
+title: "Assignment 1: Task 2"
+author: "Jessica Jagdeo"
+date: "2/2/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE)
+```
+
+Environmental and climatic variables for a range of countries have been obtained from publicly available remote sensing datasets and published on the Google Earth Engine platform (zander_venter, Kaggle). This project explores the potential associations between the country-level environmental and climatic variables through a principal components analysis. The goal is to determine if there are any associations between countries, their accessibility to cities, elevation, and mean annual temperature and precipitation. 
+
+#### 1. Load necessary packages.
+```{r}
+
+library(tidyverse)
+library(janitor)
+library(kableExtra)
+library(naniar)
+library(skimr)
+library(sf)
+library(tmap)
+library(ggfortify)
+
+```
+
+#### 2. Read in the data: Country-level environmental and climatic variables from zander_venter on Kaggle.
+```{r}
+
+# I am interested in associations between a country's accessiblity to cities, elevation, average annual rainfall, and average annual temperature, so I will simplify the raw data set to contain only these variables
+
+env_var <- read_csv("world_env_vars.csv") 
+
+env_simplified <- env_var %>% 
+  clean_names() %>% 
+  select(country, accessibility_to_cities, elevation, temp_mean_annual, rain_mean_annual)
+
+```
+
+#### 3. Simplify the data for PCA analysis.
+```{r}
+
+# Check out NAs within the simplified data frame to assess missing data points
+
+summary(env_simplified)
+
+gg_miss_var(env_simplified)
+
+# There are missing data points, but not many compared to the actual scope of the data (10 out of 243 observations), so I will retain only complete observations
+
+```
+
+```{r}
+
+# Using drop_na() to remove observations that contain at least 1 NA from simplified data set
+
+env_simp_nona <- env_simplified %>%
+  drop_na() %>% 
+  select(-country) %>% 
+  rename("Accessibility to Cities" = accessibility_to_cities, "Elevation" = elevation, "Mean Annual Temperature" = temp_mean_annual, "Mean Annual Precipitation" = rain_mean_annual)
+
+summary(env_simp_nona) # Recheck for NAs
+
+```
+
+#### 4. Conduct a Principal Components Analysis.
+```{r}
+
+# Principal Components Analysis
+
+env_var_pca <- prcomp(env_simp_nona, scale = TRUE)
+
+summary(env_var_pca)
+
+# Plot PCA results to visualize associations
+
+env_var_biplot <- autoplot(env_var_pca, 
+                      colour = "NA",
+                      loadings.colour = "blue",
+                      loadings.label = TRUE,
+                      loadings.label.size = 3,
+                      loadings.label.colour = "black",
+                      loadings.label.repel = TRUE) +
+                      theme_classic() + 
+                      labs(x = "Axis 1 (43.35%)",
+                           y = "Axis 2 (25.17%)")
+  
+
+env_var_biplot
+
+# Biplot captures about 68% of variance
+
+```
+
+**Figure 1. Principal components analysis biplot showing the associations between environmental and climatic variables at the country-level.** Variables depicted by this biplot include accessiblity to cities, mean annual precipitation, mean annual temperature, and elevation. Data source: zander_venter, Kaggle.
+
+To summarize key observations from Figure 1:
+
+1) There is no correlation between accessibility to cities and elevation. 
+
+2) There is also no correlation between accessibility to cities and mean annual temperature. 
+
+3) There is a negative correlation between elevation and mean annual temperature, so as elevation increases, mean annual temperature decreases and vice versa. 
